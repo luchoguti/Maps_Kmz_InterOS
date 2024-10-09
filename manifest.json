@@ -1,0 +1,42 @@
+{
+  "version": "1",
+  "information": {
+    "name": "kmz-interos",
+    "displayName": "Integracion software Kmz InterOS",
+    "description": "Este plugin integra el sistema de mapa Kmz",
+    "url": "https://interos.com.co",
+    "version": "1.0.0",
+    "unmsVersionCompliancy": {
+      "min": "2.1.0",
+      "max": null
+    },
+    "author": "InterOs"
+  },
+  "configuration": [
+    {
+      "key": "requiredGoogleApiKey",
+      "label": "Maps JavaScript API Key",
+      "description": "Api key for Google Maps JavaScript API.",
+      "required": 1
+    },
+    {
+      "key": "requiredKmzFile",
+      "label": "KMZ File URL",
+      "description": "URL to your KMZ file.",
+      "required": 1
+    }
+  ],
+  "menu": [
+    {
+      "key": "Red_Interna_InterOS",
+      "label": "Red Interna InterOS",
+      "type": "admin",
+      "target": "iframe"
+    }
+  ],
+  "assets": {
+    "js": [
+      "/js/secure-fields.js"
+    ]
+  }
+}

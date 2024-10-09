@@ -1,0 +1,20 @@
+{
+  "description": "UCRM plugin for Maps",
+  "version": "0.1.0",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "KMZMap\\": [
+        "src/"
+      ]
+    }
+  },
+  "require": {
+    "ext-json": "*",
+    "tecnickcom/tcpdf": "^6.3",
+    "monolog/monolog": "^2.0",
+    "symfony/http-foundation": "^5.0",
+    "endroid/qr-code": "^5.1",
+    "guzzlehttp/guzzle": "^7.9"
+  }
+}
