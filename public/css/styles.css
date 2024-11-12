@@ -283,3 +283,8 @@ input:checked ~ .slider {
     align-items: center;
     margin-right: 20px;
 }
+
+.centered-text {
+    display: flex;
+    justify-content: center;
+}

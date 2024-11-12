@@ -1,6 +1,7 @@
 import { deleteShape } from './deleteShape.js';
 import { saveShapes } from './saveShapes.js';
 import { sendToQRForm } from './sendToQRForm.js';
+import { getShapesInfo } from "./getShapesInfo.js";
 
 export const MapModule = (function () {
     let overlays = {};
@@ -58,7 +59,7 @@ export const MapModule = (function () {
 
     function initializeDrawingManager(map) {
         const drawingManager = new google.maps.drawing.DrawingManager({
-            drawingMode: google.maps.drawing.OverlayType.MARKER,
+            drawingMode: null,
             drawingControl: true,
             drawingControlOptions: {
                 position: google.maps.ControlPosition.TOP_CENTER,
@@ -76,6 +77,7 @@ export const MapModule = (function () {
 
         google.maps.event.addListener(drawingManager, 'overlaycomplete', (event) => {
             handleOverlayComplete(event, map);
+            drawingManager.setDrawingMode(null);
         });
     }
 
@@ -184,7 +186,6 @@ export const MapModule = (function () {
 
             const savedShapes = typeof response === 'string' ? JSON.parse(response) : response;
             savedShapes.forEach(shape => {
-                console.log("Cargando forma en loadSavedShapes:", shape);
                 if (shape.type === 'marker' || shape.type === 'polyline') {
                     drawShape(map, shape);
                 }
@@ -231,8 +232,6 @@ export const MapModule = (function () {
         google.maps.event.addListener(overlay, 'click', (event) => {
             openInfoWindowForMarker(map, overlay, event.latLng);
         });
-
-        console.log("Marcador cargado:", overlay);
     }
 
     function getMarkerImageUrl(markerType) {
@@ -251,12 +250,33 @@ export const MapModule = (function () {
         }
     }
 
-    function openInfoWindowForMarker(map, overlay, position) {
+    async function openInfoWindowForMarker(map, overlay, position) {
         const infoWindow = new google.maps.InfoWindow();
+        const overlayInfo = await getShapesInfo(overlay.shapeName);
+
+        let hilosFusionados = 'N/A';
+        if (overlayInfo && overlayInfo.hilos_fusionados) {
+            const hilos = JSON.parse(overlayInfo.hilos_fusionados);
+            hilosFusionados = `
+            <p>Hilos Fusionados:</p>
+            <ul>
+                <li>Caja de empalme: ${hilos.caja_de_empalme ? `${hilos.caja_de_empalme.serial} Color: ${hilos.caja_de_empalme.color}` : 'N/A'}</li>
+                <li>Caja nap: ${hilos.caja_nap ? `${hilos.caja_nap.serial} Color: ${hilos.caja_nap.color}` : 'N/A'}</li>
+            </ul>`;
+        }
         let content = `
             <div class="overlay-info">
                 <div class="overlay-name">
                     ${overlay.shapeName}
+                </div>
+                <div class="overlay-details">
+                    ${overlayInfo ? `
+                        <p class="centered-text" style="font-size: 15px; font-weight: 400;">Potencia: ${overlayInfo.potencia || 'N/A'}</p>
+                        <p class="centered-text">Puertos Disponibles: ${overlayInfo.puertos_disponibles || 'N/A'}</p>
+                        <p class="centered-text">Zona de Equipos: ${overlayInfo.zona_equipos || 'N/A'}</p>
+                        <p class="centered-text">Descripción: ${overlayInfo.descripcion || 'N/A'}</p>
+                        ${hilosFusionados}
+                    ` : '<p class="centered-text" style="margin-bottom: 10px">No additional information available</p>'}
                 </div>
             <div class="overlay-function">
             <button class="noselect delete-button" onclick="MapModule.deleteShape('${overlay.shapeName}', this)">

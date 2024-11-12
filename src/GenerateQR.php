@@ -3,6 +3,8 @@
 namespace KMZMap;
 
 use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\Label\Label;
+use Endroid\QrCode\Label\LabelAlignment;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Exception;
@@ -37,13 +39,18 @@ class GenerateQR
         }
 
         try {
-            $qrCode = QrCode::create("https://example.com/test?serial={$serial}")
+            $data = "https://red-interna.interos.com.co/user/dashboard/items?serial={$serial}";
+
+            $qrCode = QrCode::create($data)
                 ->setSize(200)
                 ->setMargin(10)
                 ->setErrorCorrectionLevel(ErrorCorrectionLevel::High);
 
+            $label = Label::create($serial)
+                ->setAlignment(LabelAlignment::Center);
+
             $writer = new PngWriter();
-            $result = $writer->write($qrCode);
+            $result = $writer->write($qrCode, null, $label);
 
             $qrImage = $result->getString();
             $filePath = __DIR__ . '/../data/qr_codes/' . $serial . '.png';
